@@ -1,0 +1,73 @@
+FeatSel(1)         Manual - User Commands  FeatSel(1)
+
+NAME
+       FeatSel - Feature Selection trainer
+
+SYNOPSIS
+       FeatSel [OPTION]...
+
+DESCRIPTION
+       FeatSel helps to perform feature selection using various methods via their best practices.It mainly uses method like filter,wrapper and embedded.
+
+       Mandatory arguments to long options are mandatory for short options too.
+
+       -b, --banner
+              To display the banner
+
+       -e, --embed
+              To use the method embed only
+
+       -f, --filter
+              To use the method filter only
+
+       -h, --help
+              To get the Manual
+
+       -i, --install
+              To install the required modules of python
+
+       -s, --setup
+              To set the environment for the command
+
+       -t, --tui
+              To experience TUI( Terminal Based Interface)
+       
+       -v, --version
+              To know the latest version information
+
+
+       -w, --wrapper
+              To use the wrapper method only
+
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       --setup
+              To set the environment for the command
+
+       
+   Exit status:
+       0      if OK,
+
+       1      if minor problems (e.g., cannot access subdirectory),
+
+       2      if serious trouble (e.g., cannot access command-line argument).
+
+AUTHOR
+       Written by Vaibhav Pareek.
+
+REPORTING BUGS
+       https://github.com/vaibhavpareek/FeatSel/issues
+
+COPYRIGHT
+       Copyright © 2020 Free Software Foundation, Inc.  License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+       This is free software: you are free to change and redistribute it.  There is NO WARRANTY, to the extent permitted by law.
+
+SEE ALSO
+       Full documentation at: <https://www.gnu.org/software/coreutils/ls>
+       or available locally via: info '(coreutils) ls invocation'
+
+              FeatSel(1)
