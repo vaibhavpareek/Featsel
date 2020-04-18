@@ -1,7 +1,7 @@
 FeatSel(1)         Manual - User Commands  FeatSel(1)
 
 NAME
-       FeatSel - Feature Selection trainer
+       FeatSel - Feature Selection Learner
 
 SYNOPSIS
        FeatSel [OPTION]...
@@ -11,8 +11,14 @@ DESCRIPTION
 
        Mandatory arguments to long options are mandatory for short options too.
 
+       -a, --add
+              To add the dataset in local center
+
        -b, --banner
               To display the banner
+
+       -d, --delete
+              To delete the dataset in local center
 
        -e, --embed
               To use the method embed only
@@ -25,6 +31,9 @@ DESCRIPTION
 
        -i, --install
               To install the required modules of python
+
+       -l, --list
+              To list the datasets in local center
 
        -s, --setup
               To set the environment for the command

@@ -1,3 +1,4 @@
+pwd = '/root/Documents/own_scripts/Featsel'
 from pandas import read_csv,get_dummies,DataFrame,Series
 import cv2
 import sys
@@ -30,25 +31,40 @@ def version():
 	exit_banner()
 	sys.exit(0)
 
-def filter(dataset):
-	print(dataset.corr())
-	graph = heatmap(dataset.corr(),annot=True).get_figure()
-	graph.savefig('SalaryData'+'.png')
-	system('eog SalaryData.png &')
-	X = get_dummies(dataset,drop_first=True)
-	y = dataset['Salary']
-	mel = mi(X,y)
-	mel = Series(mel)
-	plt.figure()
-	# mel.index = 'YearsExperience'
-	graph1 = mel.plot.bar(figsize=(10,4)).get_figure()
-	graph1.savefig('mutualreg'+'.png')
-	system('eog mutualreg.png &')
-	plt.figure()
-	pairplot(dataset)
-	graph2 = mel.plot.bar(figsize=(10,4)).get_figure()
-	graph2.savefig('pairs'+'.png')
-	system('eog pairs.png &')
+def filter(dataset,req,wk):
+	try:
+		count = 1
+		print("Features Available")
+		for i in dataset.columns:
+			print(str(count) + " "+str(i))
+			count = count+ 1
+		while True:
+			result = input("Mention Target Feature : ")
+			if(result not in dataset.columns):
+				print("No Such Feature Present")
+			else:
+				break
+		re = input("Display Correlation Between Features (y/n) : ").lower()
+		if(re=="y" or re=="yes"):
+			print(dataset.corr())
+		f = open(str(pwd)+"/workspaces/"+str(wk)+"/Correlation.txt","w+")
+		f.writelines(dataset.corr())
+		f.close()			
+		graph = heatmap(dataset.corr(),annot=True).get_figure()
+		graph.savefig(str(pwd)+"/wokspaces/"+str(wk)+'/images/Correlation.png')
+		X = get_dummies(dataset,drop_first=True)
+		y = dataset[str(result)]
+		mel = mi(X,y)
+		mel = Series(mel)
+		plt.figure()
+		graph1 = mel.plot.bar(figsize=(10,4)).get_figure()
+		graph1.savefig(str(pwd)+"/workspaces/"+str(wk)+'/images/mutualreg.png')
+		plt.figure()
+		graph2 = pairplot(dataset).get_figure()
+		graph2.savefig(str(pwd)+"/workspaces/"+str(wk)+'/images/pairs.png')
+		print("Visualize Graphs in "+str(wk)+" folder")
+	except Exception as e:
+		print("Some Error Occured : Filter Method")
 
 def filter_help():
 	print("\033[1;33;48m")
@@ -58,16 +74,36 @@ def filter_help():
 	1. Correlation -> which tells how the labels are related to each other.Require to find the relation.
 	2. mutual_info_regression-> It will help to determine how the independant feature will be able to determine the target feature.
 	3. Constant -> it gives the confirmation that constant variable will not decide the target feature.
-	4. Quasi Constant -> Removing the threshold value , we can use it to determine whether X is suffucient to determine the target result.
+	4. Quasi Constant -> Removing the threshold value , we can use it to determine whether X is suffucient to determine the target result or not.
 	""")
 
 
-def wrapper(dataset):
-	X = get_dummies(dataset,drop_first=True)
-	y = dataset['Salary']
-	model = OLS(endog=y,exog=X).fit()
-	print(model.summary())
+def wrapper(dataset,req,wk):
+	try:
+		if(req==False):
+			count = 1
+			print("Features Available")
+			for i in dataset.columns:
+				print(str(count) + " "+str(i))
+				count = count+ 1
+			while True:
+				result = input("Mention Target Feature : ")
+				if(result not in dataset.columns):
+					print("No Such Feature Present")
+				else:
+					break
+			X = get_dummies(dataset,drop_first=True)
+			y = dataset[str(result)]
+			model = OLS(endog=y,exog=X).fit()
+			f = open(str(pwd)+"/workspaces/"+str(wk)+"/summaryOLS.txt","w+")
+			f.writelines(model.summary())
+			f.close()
+			print(model.summary())
 
+		else:
+			print("Trained Model")
+	except:
+		print("Error Occured in Wrapper")
 
 def wrapper_help():
 	print("\033[1;35;48m")
@@ -83,37 +119,67 @@ def wrapper_help():
 		*OLS is the algorithm for using Wrapper Method. 
 		""")
 
-def embed(dataset):
-	X = get_dummies(dataset,drop_first=True)
-	y = dataset['Salary']
-	print("""
-		Press 1. Coeffecient or Weight
-		Press 2. Lasso (L1) Regulation
-		""")
-	ch = int(input("Choice : "))
-	X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.30,random_state=42)
-	if(ch==1):
-		model = LinearRegression()
-		model.fit(X_train.reshape(21,1),y_train)
-		y_pred = model.predict(X_test.reshape(9,1))
-		plt.scatter(X_test,y_test,color='red')
-		plt.plot(X_test,y_pred)
-		plt.title('Salary VS Experience Prediction')
-		plt.savefig('model.png')
-		for i in model.coef_:
-			print("Coeffecient : ",i)
-		print("Intercept : ",model.intercept_)
-		cdf = DataFrame(model.coef_,dataset[['YearsExperience']].columns,columns=['Coeffecients'])
-		print(cdf)
-	elif(ch==2):
-		sel = SelectFromModel(Lasso(alpha=100))
-		sel.fit(X_train,y_train)
-		print(sel.get_support())
-		print(sel.estimator_.coef_)
-		
+def embed(dataset,req,wk):
+	if(req==True):
+		print("Trained model")
 	else:
-		print("Che among the available options only")
-
+		try:
+			if(req==False):
+				count = 1
+				print("Features Available")
+				for i in dataset.columns:
+					print(str(count) + " "+str(i))
+					count = count+ 1
+				while True:
+					result = input("Mention Target Feature : ")
+					if(result not in dataset.columns):
+						print("No Such Feature Present")
+					else:
+						break	
+			X = get_dummies(dataset,drop_first=True)
+			y = dataset[str(result)]
+			print("""
+				Methods or ways of Embedded Method
+				Press 1. Coeffecient or Weight
+				Press 2. Lasso (L1) Regulation
+				""")
+			ch = int(input("Choice : "))
+			test_s = int(input("Percentage of Records for Testing Case(1%-100%) : "))
+			if(test_s<1 or test_s>100):
+				print("Range is Incorrect")
+			else:
+				test_s = float(test_s/100)
+				X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=test_s,random_state=42)
+				if(ch==1):
+					model = LinearRegression()
+					model.fit(X_train.reshape((int(len(X)-(test_s)*len(X))),1),y_train)
+					y_pred = model.predict(X_test.reshape(int((test_s)*len(X)),1))
+					plt.scatter(X_test,y_test,color='red')
+					plt.plot(X_test,y_pred)
+					plt.title('Salary VS Experience Prediction')
+					plt.savefig(str(pwd)+"/workspaces/"+str(wk)+'/model.png')
+					f = open(str(pwd)+"/workspaces/"+str(wk)+'/coeff.txt',"w+")
+					for i in model.coef_:
+						print("Coeffecient : ",i)
+						f.write(i)
+					f.write("Intercept : "+model.intercept_)
+					print("Intercept : ",model.intercept_)
+					cdf = DataFrame(model.coef_,dataset.columns,columns=['Coeffecients'])
+					f.write(cdf)
+					print(cdf)
+					f.close()
+				elif(ch==2):
+					sel = SelectFromModel(Lasso(alpha=100))
+					sel.fit(X_train,y_train)
+					print(sel.get_support())
+					print(sel.estimator_.coef_)
+					f = open(str(pwd)+"/workspaces/"+str(wk)+'/lasso.txt',"w+")
+					f.write(sel.get_support())
+					f.write(sel.estimator_.coef_)			
+				else:
+					print("Choose among the available options only")
+		except:
+			print("Some Error Occured in Embedded")
 
 def embed_help():
 	print("\033[1;32;48m")
@@ -126,35 +192,40 @@ def embed_help():
 	This method is slow in progression because it takes time to train the model.
 	""")
 def tui_interface(tui):
-	while (tui):
+	while(tui):
+		system("clear")
 		banner()
 		try:
 			print("\033[1;34;48m")
-			dataset = read_csv(input("Path to the DataSet : "))
+			wk = workspace()
 			print("Feature Selection Methods")
+			print("Hint: Use FeatSel --list to view all locally available datasets")
 			print("1. Filter Method")
 			print("2. Wrapper Method")
 			print("3. Embedded Method")
 			print("4. Exit TUI Mode")
 			ch = int(input("Enter Choice : "))
-			if(ch==1):
-				filter(dataset)
-				val = lower(input("Learn - Filter Method (y/n) : "))
-				if (val=='y' or val=='yes'):
-					filter_help()
-			elif(ch==2):
-				wrapper(dataset)
-				val = lower(input("Learn - Wrapper Method (y/n) : "))
-				if (val=='y' or val=='yes'):
-					wrapper_help()
-			elif(ch==3):
-				embed(dataset)
-				val = lower(input("Learn - Embedded Method (y/n) : "))
-				if (val=='y' or val=='yes'):
-					embed_help()
-			elif(ch==4):
-				exit_banner()
-				sys.exit(0)		
+			choice = input("Local Dataset or Remote Dataset (l/r) : ").lower()
+			dataset=""
+			funct=["filter("+str(dataset)+","+"True"+","+str(wk)+")","wrapper("+str(dataset)+","+"True"+","+str(wk)+")","embed("+str(dataset)+","+"True"+","+str(wk)+")"]
+			if(choice=='l' or choice=='local'):
+				data = input("Name of the DataSet : ")
+				if(isavail(str(data))):
+					dataset = read_csv(str(pwd)+"/Demodataset/"+str(data))
+					if(ch==4):
+						exit_banner()
+						sys.exit(0)
+					elif(ch>=1 or ch<=3:
+						eval(funct[ch-1])
+					else:
+						print("Wrong Choice")
+				else:
+					print("Dataset is not present")
+			elif(ch=='r' or ch=='remote'):
+				dataset = read_csv(input("Location/Path of the DataSet : "))
+				filter(dataset,wk)
+			else:
+				print("No Such Option available")				
 		except KeyboardInterrupt:
 			exit_banner()
 			sys.exit(0)	
@@ -183,7 +254,8 @@ def list_dataset():
 	try:
 		print("List of Dataset's Locally Present")
 		print("\033[1;33;48m")
-		ls = popen('ls Demodataset/').read()
+		pwd_list = str(pwd)+"/Demodataset"
+		ls = popen('ls '+str(pwd_list)).read()
 		if(len(ls)==0):
 			print("--no-local dataset")
 		else:
@@ -195,19 +267,93 @@ def list_dataset():
 		print("Some Error Occured in Listing Dataset")
 		sys.exit()	
 
+def isavail(dataset):
+	system('ls '+str(pwd)+'/Demodataset/ > temp.txt')
+	dataset=dataset+"\n"
+	f = open("temp.txt","r")
+	Lines = f.readlines()
+	flag = True
+	if(dataset in Lines):
+		flag=False
+	f.close()
+	system("rm temp.txt")
+	if(flag):
+		print("No Dataset with such Name is present in Local center")
+		return False
+	else:
+		return True 
+
+def workspace():
+	banner()
+	ch = input("Workspace (New/Old) : ").lower()
+	if(ch=='o' or ch=='old'):
+		w_name = input("WorkSpace Name : ")
+		f = open("workspace.txt","r")
+		lines = f.readlines()
+		f.close()
+		for w_name in lines:
+			print("WorkSpace loaded Successfully")		
+	elif(ch=='n' or ch=='new'):
+		w_name = input("Workspace Space Name : ")
+		f = open("workspace.txt","w+")
+		f.writelines(str(w_name))
+		f.close()
+		system("mkdir -p "+str(pwd)+"/Workspaces/"+str(w_name)+"/images/")
+		print("Workspaces created Successfully")
+	else:
+		print("Wrong Choice")
+	return w_name
+
+def delete_dataset():
+	try:
+		print("List of Dataset's Locally Present")
+		print("\033[1;33;48m")
+		pwd_list = str(pwd)+"/Demodataset"
+		ls = popen('ls '+str(pwd_list)).read()
+		if(len(ls)==0):
+			print("--no-local dataset")
+		else:
+			print(ls)
+		ty = input("DataSet Name wants to delete : ")
+		system('ls '+str(pwd)+'/Demodataset/ > temp.txt')
+		f = open("temp.txt","r")
+		flag = True
+		for i in f:
+			if str(ty) in i:
+				system("rm "+str(pwd)+"/Demodataset/"+str(ty))
+				print("Dataset Removed Successfully")
+				flag = False
+				break
+		if(flag):
+			print("No Dataset with such Name is present in Local center")
+		f.close()
+		system("rm temp.txt")
+		exit_banner()
+		sys.exit(0)
+	except Exception as e:
+		print(e)
+		print("Some Error Occured in Deleting Dataset")
+		sys.exit()	
+
+
+
 def add_dataset():
 	print("\033[1;32;48m")
 	print("Add DataSet to Local DataBase")
 	df = input("Location of the DataSet : ")
 	df_name = df.split("/")
 	try:
-		system('ls Demodataset/ > temp.txt')
+		system('ls '+str(pwd)+'/Demodataset/ > temp.txt')
 		f = open("temp.txt","r")
-		if(str(df_name[-1]) in f):
-			print("DataSet with this name already exist.")
-		else:
-			system("cp "+df+" Demodataset/")
+		flag = True
+		for i in f:
+			if str(df_name[-1]) in i:
+				print("DataSet with this name already exist.")
+				flag = False
+		if(flag):
+			system("cp "+df+" "+str(pwd)+"/Demodataset/")
 			print("Successfully Added")
+		f.close()	
 		system('rm temp.txt')
 		exit_banner()
 		sys.exit(0)
@@ -238,31 +384,95 @@ def main():
 					sys.exit(0)
 			elif(arg[1]=="--filter"or arg[1]=="-f"):
 				print("\033[1;34;48m")
-				dataset = read_csv(input("Path to the DataSet : "))
-				filter(dataset)
-				val = lower(input("Learn - Filter Method (y/n) : "))
+				wk = workspace()
+				print("Filter Method for Feature Selection")
+				print("Hint: Use FeatSel --list to view all locally available datasets")
+				ch = input("Local Dataset or Remote Dataset (l/r) : ").lower()
+				if(ch=='l' or ch=='local'):
+					data = input("Name of the DataSet : ")
+					if(isavail(str(data))):
+						dataset = read_csv(str(pwd)+"/Demodataset/"+str(data))
+						filter(dataset,wk)
+					else:
+						print("Dataset is not present")
+				elif(ch=='r' or ch=='remote'):
+					dataset = read_csv(input("Location/Path of the DataSet : "))
+					filter(dataset,wk)
+				else:
+					print("No Such Option available")
+				val = input("Learn - Filter Method (y/n) : ").lower()
 				if (val=='y' or val=='yes'):
 					filter_help()
+				exit_banner()
+				sys.exit(0)
 			elif(arg[1]=="--wrapper"or arg[1]=="-w"):
 				print("\033[1;34;48m")
-				dataset = read_csv(input("Path to the DataSet : "))
-				wrapper(dataset)
-				val = lower(input("Learn - Wrapper Method (y/n) : "))
+				wk=Workspace()
+				print("Wrapper Method for Feature Selection")
+				print("Hint: Use FeatSel --list to view all locally available datasets")
+				tr = input("Do you have trained Model (y/n) : ").lower()
+				if(tr=='y' or tr=='yes'):
+					loc = input("Location/Path of Trained Model : ")
+					wrapper(loc,True,wk)
+				elif(tr =='n' or tr=='no'):
+					ch = input("Local Dataset or Remote Dataset (l/r) : ").lower()
+					if(ch=='l' or ch=='local'):
+						data = input("Name of the DataSet : ")
+						if(isavail(str(data))):
+							dataset = read_csv(str(pwd)+"/Demodataset/"+str(data))
+							wrapper(dataset,False,wk)
+						else:
+							print("Dataset is not present")
+					elif(ch=='r' or ch=='remote'):
+						dataset = read_csv(input("Location/Path of the DataSet : "))
+						wrapper(dataset,False,wk)
+					else:
+						print("No Such Option available")
+				else:
+					print("No Such Option available")
+				val = input("Learn - Wrapper Method (y/n) : ").lower()
 				if (val=='y' or val=='yes'):
 					wrapper_help()
+				exit_banner()
+				sys.exit(0)
 			elif(arg[1]=="--embed"or arg[1]=="-e"):
 				print("\033[1;34;48m")
-				dataset = read_csv(input("Path to the DataSet : "))
-				embed(dataset)
-				val = lower(input("Learn - Embedded Method (y/n) : "))
+				print("Embedded Method for Feature Selection")
+				print("Hint: Use FeatSel --list to view all locally available datasets")
+				tr = input("Do you have trained Model (y/n) : ").lower()
+				if(tr=='y' or tr=='yes'):
+					loc = input("Location/Path of Trained Model : ")
+					embed(loc,True,wk)
+				elif(tr =='n' or tr=='no'):
+					ch = input("Local Dataset or Remote Dataset (l/r) : ").lower()
+					if(ch=='l' or ch=='local'):
+						data = input("Name of the DataSet : ")
+						if(isavail(str(data))):
+							dataset = read_csv(str(pwd)+"/Demodataset/"+str(data))
+							embed(dataset,False,wk)
+						else:
+							print("Dataset is not present")
+					elif(ch=='r' or ch=='remote'):
+						dataset = read_csv(input("Location/Path of the DataSet : "))
+						embed(dataset,False,wk)
+					else:
+						print("No Such Option available")
+				else:
+					print("No Such Option available")
+				val = input("Learn - Embedded Method (y/n) : ").lower()
 				if (val=='y' or val=='yes'):
-					filter_help()
+					embed_help()
+				exit_banner()
+				sys.exit(0)
 			elif(arg[1]=="--version"or arg[1]=="-v"):
 				print("\033[1;34;48m")
 				version()
 			elif(arg[1]=="--setup"or arg[1]=="-s"):
 				print("\033[1;34;48m")
 				setup()
+			elif(arg[1]=="--delete"or arg[1]=="-d"):
+				print("\033[1;34;48m")
+				delete_dataset()
 			elif(arg[1]=="--list" or arg[1]=="-l"):
 				print("\033[1;34;48m")
 				list_dataset()
@@ -278,7 +488,7 @@ def main():
 			exit_banner()
 			sys.exit(0)
 		except Exception as e:
-			print("2."+str(e))
+			print("Error."+str(e))
 			print("Some Error Occured")
 			exit_banner()
 			sys.exit(0)
