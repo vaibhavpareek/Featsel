@@ -30,6 +30,38 @@ def version():
 	print("FeatSel 1.0.0")
 	exit_banner()
 	sys.exit(0)
+def workspace():
+	try:
+		while True:
+			system("clear")
+			banner()
+			ch = input("Workspace (New/Old) : ").lower()
+			w_name = input("WorkSpace Name : ")
+			if(ch=='o' or ch=='old'):
+				f = open(str(pwd)+"/workspace.txt","r")
+				lines = f.readlines()
+				f.close()
+				for w_name in lines:
+					print("WorkSpace loaded Successfully")
+				break		
+			elif(ch=='n' or ch=='new'):
+				f = open(str(pwd)+"/workspace.txt","w+")
+				f.writelines(str(w_name))
+				f.close()
+				system("mkdir -p "+str(pwd)+"/Workspaces/"+str(w_name)+"/images/")
+				print("Workspaces created Successfully")
+				break
+		return w_name
+	except KeyboardInterrupt:
+		exit_banner()
+		sys.exit(0)
+	except Exception as e:
+		print(e)
+		print("Error Creating Workspace")
+		exit_banner()
+		sys.exit(0)
+
+
 
 def filter(dataset,req,wk):
 	try:
@@ -39,31 +71,29 @@ def filter(dataset,req,wk):
 			print(str(count) + " "+str(i))
 			count = count+ 1
 		while True:
-			result = input("Mention Target Feature : ")
-			if(result not in dataset.columns):
-				print("No Such Feature Present")
+			index = int(input("Mention Target Feature [Number]: "))
+			if index<1 or index>len(dataset.columns):
+				print("Index should be among the list only")
 			else:
 				break
 		re = input("Display Correlation Between Features (y/n) : ").lower()
 		if(re=="y" or re=="yes"):
 			print(dataset.corr())
-		f = open(str(pwd)+"/workspaces/"+str(wk)+"/Correlation.txt","w+")
-		f.writelines(dataset.corr())
-		f.close()			
+		dataset.corr().to_csv(str(pwd)+"/Workspaces/"+str(wk)+"/Correlation.csv",index=True)
 		graph = heatmap(dataset.corr(),annot=True).get_figure()
-		graph.savefig(str(pwd)+"/wokspaces/"+str(wk)+'/images/Correlation.png')
+		graph.savefig(str(pwd)+"/Workspaces/"+str(wk)+'/images/Correlation.png')
 		X = get_dummies(dataset,drop_first=True)
-		y = dataset[str(result)]
+		y = dataset[str(dataset.columns[index-1])]
 		mel = mi(X,y)
 		mel = Series(mel)
 		plt.figure()
 		graph1 = mel.plot.bar(figsize=(10,4)).get_figure()
-		graph1.savefig(str(pwd)+"/workspaces/"+str(wk)+'/images/mutualreg.png')
+		graph1.savefig(str(pwd)+"/Workspaces/"+str(wk)+'/images/mutualreg.png')
 		plt.figure()
-		graph2 = pairplot(dataset).get_figure()
-		graph2.savefig(str(pwd)+"/workspaces/"+str(wk)+'/images/pairs.png')
+		graph2 = pairplot(dataset).savefig(str(pwd)+"/Workspaces/"+str(wk)+'/images/pairs.png')
 		print("Visualize Graphs in "+str(wk)+" folder")
 	except Exception as e:
+		print(e)
 		print("Some Error Occured : Filter Method")
 
 def filter_help():
@@ -87,22 +117,23 @@ def wrapper(dataset,req,wk):
 				print(str(count) + " "+str(i))
 				count = count+ 1
 			while True:
-				result = input("Mention Target Feature : ")
-				if(result not in dataset.columns):
-					print("No Such Feature Present")
+				index = int(input("Mention Target Feature [Number]: "))
+				if index<1 or index>len(dataset.columns):
+					print("Index should be among the list only")
 				else:
 					break
 			X = get_dummies(dataset,drop_first=True)
-			y = dataset[str(result)]
+			y = dataset[str(dataset.columns[index-1])]
 			model = OLS(endog=y,exog=X).fit()
-			f = open(str(pwd)+"/workspaces/"+str(wk)+"/summaryOLS.txt","w+")
-			f.writelines(model.summary())
+			f = open(str(pwd)+"/Workspaces/"+str(wk)+"/summaryOLS.txt","w+")
+			f.write(str(model.summary()))
 			f.close()
 			print(model.summary())
 
 		else:
 			print("Trained Model")
-	except:
+	except Exception as e:
+		print(e)
 		print("Error Occured in Wrapper")
 
 def wrapper_help():
@@ -120,66 +151,89 @@ def wrapper_help():
 		""")
 
 def embed(dataset,req,wk):
-	if(req==True):
-		print("Trained model")
-	else:
-		try:
-			if(req==False):
-				count = 1
-				print("Features Available")
-				for i in dataset.columns:
-					print(str(count) + " "+str(i))
-					count = count+ 1
-				while True:
-					result = input("Mention Target Feature : ")
-					if(result not in dataset.columns):
-						print("No Such Feature Present")
-					else:
-						break	
-			X = get_dummies(dataset,drop_first=True)
-			y = dataset[str(result)]
+	try:
+		if(req==True):
+			print("Model Trained")
+		elif(req==False):
+			count = 1
+			print("Features Available")
+			for i in dataset.columns:
+				print(str(count) + " "+str(i))
+				count = count+ 1
+			while True:
+				index = int(input("Mention Target Feature [Number]: "))
+				if index<1 or index>len(dataset.columns):
+					print("Note: Index should be among the list only")
+				else:
+					break	
+			if(len(dataset.columns)==2):
+				y = dataset[dataset.columns[index-1]] 
+				if(index==1):
+					X = dataset[dataset.columns[index]]
+				else:
+					X = dataset[dataset.columns[0]]
+			else:
+				X = get_dummies(dataset,drop_first=True)
+				y = dataset[dataset.columns[index-1]]
 			print("""
 				Methods or ways of Embedded Method
 				Press 1. Coeffecient or Weight
 				Press 2. Lasso (L1) Regulation
+				Press 3. To Exit
 				""")
-			ch = int(input("Choice : "))
-			test_s = int(input("Percentage of Records for Testing Case(1%-100%) : "))
-			if(test_s<1 or test_s>100):
-				print("Range is Incorrect")
-			else:
-				test_s = float(test_s/100)
-				X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=test_s,random_state=42)
-				if(ch==1):
-					model = LinearRegression()
-					model.fit(X_train.reshape((int(len(X)-(test_s)*len(X))),1),y_train)
-					y_pred = model.predict(X_test.reshape(int((test_s)*len(X)),1))
-					plt.scatter(X_test,y_test,color='red')
-					plt.plot(X_test,y_pred)
-					plt.title('Salary VS Experience Prediction')
-					plt.savefig(str(pwd)+"/workspaces/"+str(wk)+'/model.png')
-					f = open(str(pwd)+"/workspaces/"+str(wk)+'/coeff.txt',"w+")
-					for i in model.coef_:
-						print("Coeffecient : ",i)
-						f.write(i)
-					f.write("Intercept : "+model.intercept_)
-					print("Intercept : ",model.intercept_)
-					cdf = DataFrame(model.coef_,dataset.columns,columns=['Coeffecients'])
-					f.write(cdf)
-					print(cdf)
-					f.close()
-				elif(ch==2):
-					sel = SelectFromModel(Lasso(alpha=100))
-					sel.fit(X_train,y_train)
-					print(sel.get_support())
-					print(sel.estimator_.coef_)
-					f = open(str(pwd)+"/workspaces/"+str(wk)+'/lasso.txt',"w+")
-					f.write(sel.get_support())
-					f.write(sel.estimator_.coef_)			
-				else:
+			while True:
+				ch = int(input("Choice : "))
+				if(ch==3):
+					exit_banner()
+					sys.exit(0)
+				elif(ch>3 or ch<1):
 					print("Choose among the available options only")
-		except:
-			print("Some Error Occured in Embedded")
+				else:
+					break
+			while True:
+				test_s = int(input("Percentage of Records for Testing Case(1%-100%) : "))
+				if(test_s<1 or test_s>100):
+					print("Range is Incorrect")
+				else:
+					test_s = float(test_s/100)
+					X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=test_s,random_state=42)
+					if(ch==1):
+						model = LinearRegression()
+						if(len(X_train.values.shape)==1):
+							X_train = X_train.values.reshape((int(len(X)-(test_s)*len(X))),1)
+							X_test = X_test.values.reshape(int((test_s)*len(X)),1)
+						model.fit(X_train,y_train)
+						y_pred = model.predict(X_test)
+						plt.scatter(X_test,y_test,color='red')
+						plt.plot(X_test,y_pred)
+						plt.title('Salary VS Experience Prediction')
+						plt.savefig(str(pwd)+"/Workspaces/"+str(wk)+'/images/linearmodel.png')
+						f = open(str(pwd)+"/Workspaces/"+str(wk)+'/coeff.txt',"w+")
+						for i in model.coef_:
+							print("Coeffecient : ",i)
+							f.write("Coeffecient : "+str(i))
+						f.write("Intercept : "+str(model.intercept_))
+						print("Intercept : ",model.intercept_)
+						if(len(model.coef_)>1):
+							cdf = DataFrame(model.coef_,dataset.columns,columns=['Coeffecients'])
+							f.write(str(cdf))
+							print(cdf)
+							f.close()
+					elif(ch==2):
+						sel = SelectFromModel(Lasso(alpha=100))
+						sel.fit(X_train,y_train)
+						print(sel.get_support())
+						print(sel.estimator_.coef_)
+						f = open(str(pwd)+"/Workspaces/"+str(wk)+'/lasso.txt',"w+")
+						f.write(str(sel.get_support()))
+						f.write(str(sel.estimator_.coef_))	
+					break		
+	except KeyboardInterrupt:
+		exit_banner()
+		sys.exit(0)
+	except Exception as e:
+		print(e)
+		print("Some Error Occured in Embedded")
 
 def embed_help():
 	print("\033[1;32;48m")
@@ -192,12 +246,15 @@ def embed_help():
 	This method is slow in progression because it takes time to train the model.
 	""")
 def tui_interface(tui):
+	begin = True;
 	while(tui):
 		system("clear")
 		banner()
 		try:
 			print("\033[1;34;48m")
-			wk = workspace()
+			if(begin==True):
+				wk = workspace()
+				begin=False
 			print("Feature Selection Methods")
 			print("Hint: Use FeatSel --list to view all locally available datasets")
 			print("1. Filter Method")
@@ -205,27 +262,33 @@ def tui_interface(tui):
 			print("3. Embedded Method")
 			print("4. Exit TUI Mode")
 			ch = int(input("Enter Choice : "))
-			choice = input("Local Dataset or Remote Dataset (l/r) : ").lower()
-			dataset=""
-			funct=["filter("+str(dataset)+","+"True"+","+str(wk)+")","wrapper("+str(dataset)+","+"True"+","+str(wk)+")","embed("+str(dataset)+","+"True"+","+str(wk)+")"]
-			if(choice=='l' or choice=='local'):
-				data = input("Name of the DataSet : ")
-				if(isavail(str(data))):
-					dataset = read_csv(str(pwd)+"/Demodataset/"+str(data))
-					if(ch==4):
-						exit_banner()
-						sys.exit(0)
-					elif(ch>=1 or ch<=3:
-						eval(funct[ch-1])
+			if(ch==4):
+				exit_banner()
+				sys.exit(0)
+			elif(ch>=1 and ch<4):
+				choice = input("Local Dataset or Remote Dataset (l/r) : ").lower()
+				if(choice=='l' or choice=='local'):
+					data = input("Name of the DataSet : ")
+					if(isavail(str(data))):
+						dataset = read_csv(str(pwd)+"/Demodataset/"+str(data))
+						if(ch==1):
+							filter(dataset,False,wk)
+						elif(ch==2):
+							wrapper(dataset,False,wk)
+						else:
+							embed(dataset,False,wk)
 					else:
-						print("Wrong Choice")
+						print("Dataset is not present")
+				elif(ch=='r' or ch=='remote'):
+					dataset = read_csv(input("Location/Path of the DataSet : "))
+					if(ch==1):
+							filter(dataset,False,wk)
+					elif(ch==2):
+						wrapper(dataset,False,wk)
+					else:
+						embed(dataset,False,wk)
 				else:
-					print("Dataset is not present")
-			elif(ch=='r' or ch=='remote'):
-				dataset = read_csv(input("Location/Path of the DataSet : "))
-				filter(dataset,wk)
-			else:
-				print("No Such Option available")				
+					print("No Such Option available")				
 		except KeyboardInterrupt:
 			exit_banner()
 			sys.exit(0)	
@@ -234,8 +297,8 @@ def tui_interface(tui):
 
 def help():
 	try:	
-		system("chmod +x manual")
-		system("man ./manual")
+		system("chmod +x "+str(pwd)+"/manual")
+		system("man "+str(pwd)+"/./manual")
 		exit_banner(0)
 	except:
 		sys.exit(0)
@@ -283,26 +346,6 @@ def isavail(dataset):
 	else:
 		return True 
 
-def workspace():
-	banner()
-	ch = input("Workspace (New/Old) : ").lower()
-	if(ch=='o' or ch=='old'):
-		w_name = input("WorkSpace Name : ")
-		f = open("workspace.txt","r")
-		lines = f.readlines()
-		f.close()
-		for w_name in lines:
-			print("WorkSpace loaded Successfully")		
-	elif(ch=='n' or ch=='new'):
-		w_name = input("Workspace Space Name : ")
-		f = open("workspace.txt","w+")
-		f.writelines(str(w_name))
-		f.close()
-		system("mkdir -p "+str(pwd)+"/Workspaces/"+str(w_name)+"/images/")
-		print("Workspaces created Successfully")
-	else:
-		print("Wrong Choice")
-	return w_name
 
 def delete_dataset():
 	try:
@@ -367,6 +410,8 @@ def main():
 		print("More Arguments are passed then Required")
 		exit_banner()
 		sys.exit(0)
+	elif(len(arg)<2):
+		print("FeatSel works with options only , Refer FeatSel --help to know more.")
 	else:
 		try:				
 			if(arg[1]=="--help" or arg[1]=="-h"):
@@ -392,7 +437,7 @@ def main():
 					data = input("Name of the DataSet : ")
 					if(isavail(str(data))):
 						dataset = read_csv(str(pwd)+"/Demodataset/"+str(data))
-						filter(dataset,wk)
+						filter(dataset,False,wk)
 					else:
 						print("Dataset is not present")
 				elif(ch=='r' or ch=='remote'):
@@ -407,7 +452,7 @@ def main():
 				sys.exit(0)
 			elif(arg[1]=="--wrapper"or arg[1]=="-w"):
 				print("\033[1;34;48m")
-				wk=Workspace()
+				wk=workspace()
 				print("Wrapper Method for Feature Selection")
 				print("Hint: Use FeatSel --list to view all locally available datasets")
 				tr = input("Do you have trained Model (y/n) : ").lower()
@@ -437,6 +482,7 @@ def main():
 				sys.exit(0)
 			elif(arg[1]=="--embed"or arg[1]=="-e"):
 				print("\033[1;34;48m")
+				wk=workspace()
 				print("Embedded Method for Feature Selection")
 				print("Hint: Use FeatSel --list to view all locally available datasets")
 				tr = input("Do you have trained Model (y/n) : ").lower()

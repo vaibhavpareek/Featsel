@@ -75,8 +75,4 @@ COPYRIGHT
        Copyright © 2020 Free Software Foundation, Inc.  License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
        This is free software: you are free to change and redistribute it.  There is NO WARRANTY, to the extent permitted by law.
 
-SEE ALSO
-       Full documentation at: <https://www.gnu.org/software/coreutils/ls>
-       or available locally via: info '(coreutils) ls invocation'
-
               FeatSel(1)
