@@ -8,9 +8,19 @@
 - [x]  RAM : >2GB(Prefer)
 - [x]  Space : Around 50MB (Later depends on Dataset) 
 
-# Download the FeatSel
+## [Download](https://github.com/vaibhavpareek/Featsel.git) the FeatSel
+```git clone https://github.com/vaibhavpareek/Featsel.git```
 
 
-# Environment Setup
+## Environment Setup
+> Mandatory to do Setup Environment once before you use **FeatSel**
+
 Use ```python3 setup.py``` to configure the environment for ***FeatSel*** .
   
+## Install Packages or Dependencies
+> Use either ```FeatSel --install  or FeatSel --i```
+
+## Help or Documentation - FeatSel
+> Use either ```FeatSel --help or FeatSel -h```
+
+
