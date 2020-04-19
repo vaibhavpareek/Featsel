@@ -51,4 +51,4 @@ Next Version :soon:**
 ## Contributor
 [![Linkedin](https://img.shields.io/badge/Linkedin-Vaibhav_Pareek-<COLOR>.svg)](https://www.linkedin.com/in/vaibhavvp/)
 
-## [Demonstration of FeatSel](https://github.com)
+## [Demonstration of FeatSel](https://www.linkedin.com/posts/vaibhavvp_quarantinedayss-coding-linux-activity-6657516985062125568-x6a7)
