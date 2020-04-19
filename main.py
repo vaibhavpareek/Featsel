@@ -284,10 +284,13 @@ def tui_interface(tui):
 						dataset = read_csv(str(pwd)+"/Demodataset/"+str(data))
 						if(ch==1):
 							filter(dataset,False,wk)
+							input("Press Any Key to Continue ... ")
 						elif(ch==2):
 							wrapper(dataset,False,wk)
-						else:
+							input("Press Any Key to Continue ... ")
+						elif(ch==3):
 							embed(dataset,False,wk)
+							input("Press Any Key to Continue ... ")
 					else:
 						print("Dataset is not present")
 				elif(ch=='r' or ch=='remote'):
@@ -296,7 +299,7 @@ def tui_interface(tui):
 							filter(dataset,False,wk)
 					elif(ch==2):
 						wrapper(dataset,False,wk)
-					else:
+					elif(ch==3):
 						embed(dataset,False,wk)
 				else:
 					print("No Such Option available")				
