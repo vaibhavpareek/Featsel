@@ -1,7 +1,11 @@
-# Featsel
-*Featsel is a command line linux based tool . which can be used for feature selection in Machine Learning.Also it is a full fledge linux command with manual page and several other features.*
+# Featsel 
+[![version](https://img.shields.io/badge/version-1.0.1-red.svg)](https://github.com/vaibhavpareek/featsel/)
+<img src="https://img.shields.io/badge/made%20with-python-blue.svg" alt="made with python">
 
-# Prerequisite
+*Featsel is a command line linux based tool . which can be used for feature selection in Machine Learning.Also it is a full fledge linux command with manual page and several other features.*
+![FeatSel Logo](/logo/logo.png)
+
+# Prerequisite 
 - [x]  Operating System  : Linux
 - [x]  Python3 : Installed and Configured
 - [x]  Permissions : Run as Root
@@ -23,4 +27,16 @@ Use ```python3 setup.py``` to configure the environment for ***FeatSel*** .
 ## Help or Documentation - FeatSel
 > Use either ```FeatSel --help or FeatSel -h```
 
+## Launch [TUI](https://en.wikipedia.org/wiki/Text-based_user_interface) Mode
+> Use either ```FeatSel --tui or FeatSel --t```
+
+
+
+## Feature Selection Methods Used in this Tool :books:
+>   1. Filter Method  
+>   2. Wrapper Method
+>   3. Embedded Method
+
+## Current Version 1.0.0
+Next Version :soon:
 
