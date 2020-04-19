@@ -33,10 +33,16 @@ Use ```python3 setup.py``` to configure the environment for ***FeatSel*** .
 
 
 ## Feature Selection Methods Used in this Tool :books:
->   1. Filter Method  
->   2. Wrapper Method
->   3. Embedded Method
+```
+1. Filter Method  
+2. Wrapper Method
+3. Embedded Method
+```
 
 ## Current Version 1.0.0
 Next Version :soon:
 
+## Contributor
+[![Linkedin](https://img.shields.io/badge/Linkedin-Vaibhav_Pareek-<COLOR>.svg)](https://www.linkedin.com/in/vaibhavvp/)
+
+## [Demonstration of FeatSel](https://github.com)
