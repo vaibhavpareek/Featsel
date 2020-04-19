@@ -2,7 +2,7 @@
 [![version](https://img.shields.io/badge/version-1.0.1-red.svg)](https://github.com/vaibhavpareek/featsel/)
 <img src="https://img.shields.io/badge/made%20with-python-blue.svg" alt="made with python">
 
-***Featsel is a command line linux based tool . which can be used for feature selection in Machine Learning.Also it is a full fledge linux command with manual page and several other features.***
+*Featsel is a command line linux based tool . which can be used for feature selection in Machine Learning.Also it is a full fledge linux command with manual page and several other features.Using this tool you will get to know more about the valuable features to predict target feature.*
 
 ![FeatSel Logo](/logo/logo.png)
 
