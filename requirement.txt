@@ -4,6 +4,6 @@ seaborn
 os-sys
 scikit-learn
 pyfiglet
-statsmodel
+statsmodels
 clint
 matplotlib

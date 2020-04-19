@@ -129,7 +129,18 @@ def wrapper(dataset,req,wk):
 			f.write(str(model.summary()))
 			f.close()
 			print(model.summary())
-
+			from numpy import array
+			dt = model.pvalues.to_csv(str(pwd)+"/Workspaces/"+str(wk)+'/impfeatures.csv',header=True)
+			dt = read_csv(str(pwd)+"/Workspaces/"+str(wk)+'/impfeatures.csv')
+			dt = array(dt)
+			print("Important Feature for Predicting Target Feature\n")
+			f = open(str(pwd)+"/Workspaces/"+str(wk)+"/impfeatures.txt","w+")
+			f.write("Important Features")
+			for i in dt:
+				if i[1]<0.05:
+					print(str(i[0]))
+					f.write(str(str(i[0])+" " + str(i[1]))+"\n")
+			f.close()
 		else:
 			print("Trained Model")
 	except Exception as e:
@@ -193,7 +204,7 @@ def embed(dataset,req,wk):
 			while True:
 				test_s = int(input("Percentage of Records for Testing Case(1%-100%) : "))
 				if(test_s<1 or test_s>100):
-					print("Range is Incorrect")
+					print("Range is Incorrect\n")
 				else:
 					test_s = float(test_s/100)
 					X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=test_s,random_state=42)
@@ -206,12 +217,12 @@ def embed(dataset,req,wk):
 						y_pred = model.predict(X_test)
 						plt.scatter(X_test,y_test,color='red')
 						plt.plot(X_test,y_pred)
-						plt.title('Salary VS Experience Prediction')
+						plt.title('DataSet Coeffecient')
 						plt.savefig(str(pwd)+"/Workspaces/"+str(wk)+'/images/linearmodel.png')
 						f = open(str(pwd)+"/Workspaces/"+str(wk)+'/coeff.txt',"w+")
 						for i in model.coef_:
 							print("Coeffecient : ",i)
-							f.write("Coeffecient : "+str(i))
+							f.write("Coeffecient : "+str(i)+"\n")
 						f.write("Intercept : "+str(model.intercept_))
 						print("Intercept : ",model.intercept_)
 						if(len(model.coef_)>1):
