@@ -1,7 +1,10 @@
 #Set up the Environment
-echo "alias FeatSel='python3 $PWD/main.py'" >> ~/.bashrc
-#Set the PWD for the main file
 from os import system,rename,popen
+comm = """
+echo "alias FeatSel='python3 $PWD/main.py'" >> ~/.bashrc
+"""
+system(comm)
+#Set the PWD for the main file
 r = open("main.py","r")
 w = open("temp.py","w")
 k = 0
