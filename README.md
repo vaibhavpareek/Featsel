@@ -42,12 +42,12 @@ Use ```python3 setup.py``` to configure the environment for ***FeatSel*** .
 ```
 
 ## License
- ```This project is licensed under the Apache License - see the [LICENSE.md](/LICENSE) file for details   ```
+ This project is licensed under the Apache License - see the [LICENSE.md](/LICENSE) file for details
  
 ## Versioning 
-```Version : 1.0.0
-Next Version :soon:
-```
+**Version : 1.0.0
+Next Version :soon:**
+
 ## Contributor
 [![Linkedin](https://img.shields.io/badge/Linkedin-Vaibhav_Pareek-<COLOR>.svg)](https://www.linkedin.com/in/vaibhavvp/)
 
