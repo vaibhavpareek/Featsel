@@ -2,7 +2,7 @@ pwd = '/root/Documents/own_scripts/Featsel'
 from pandas import read_csv,get_dummies,DataFrame,Series
 import cv2
 import sys
-from seaborn import heatmap,pairplot
+from seaborn import heatmap,pairplot,set
 from os import system,popen
 from sklearn.feature_selection import mutual_info_regression as mi
 import matplotlib.pyplot as plt
@@ -13,6 +13,7 @@ from sklearn.linear_model import Lasso
 from statsmodels.api import OLS
 from pyfiglet import Figlet
 from clint.textui import colored
+set()
 
 def banner():
 	banner1 = Figlet(font='sblood')
@@ -184,7 +185,7 @@ def embed(dataset,req,wk):
 				else:
 					X = dataset[dataset.columns[0]]
 			else:
-				X = get_dummies(dataset,drop_first=True)
+				X = get_dummies(dataset.loc[:,dataset.columns!=dataset.columns[index-1]],drop_first=True)
 				y = dataset[dataset.columns[index-1]]
 			print("""
 				Methods or ways of Embedded Method
@@ -210,34 +211,47 @@ def embed(dataset,req,wk):
 					X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=test_s,random_state=42)
 					if(ch==1):
 						model = LinearRegression()
-						if(len(X_train.values.shape)==1):
-							X_train = X_train.values.reshape((int(len(X)-(test_s)*len(X))),1)
-							X_test = X_test.values.reshape(int((test_s)*len(X)),1)
 						model.fit(X_train,y_train)
 						y_pred = model.predict(X_test)
-						plt.scatter(X_test,y_test,color='red')
-						plt.plot(X_test,y_pred)
+						plt.scatter(y_pred,y_test,color='red')
+						plt.plot(y_pred,y_test)
 						plt.title('DataSet Coeffecient')
 						plt.savefig(str(pwd)+"/Workspaces/"+str(wk)+'/images/linearmodel.png')
 						f = open(str(pwd)+"/Workspaces/"+str(wk)+'/coeff.txt',"w+")
-						for i in model.coef_:
-							print("Coeffecient : ",i)
-							f.write("Coeffecient : "+str(i)+"\n")
-						f.write("Intercept : "+str(model.intercept_))
-						print("Intercept : ",model.intercept_)
+						cols = list(X.columns)
+						print("Features  :   Coeffecient")
+						f.write("Features  :   Coeffecient\n")
+						for (i,j) in zip(list(model.coef_),cols):
+							print(str(j)+" : "+str(i))
+							f.write(str(j)+" : "+str(i))
+						f.write("\nIntercept : "+str(model.intercept_)+"\n")
+						print("\nIntercept : ",model.intercept_)
+						print("\nImportant Features based on their Coeffecients/Weights\n")
+						f.write("\nImportant Features based on their Coeffecients/Weights\n")
+						for (i,j) in zip(list(model.coef_),cols):
+							if(i>0):
+								print(str(j) + " : "+ str(i))
+								f.write(str(j) + " : "+ str(i))
 						if(len(model.coef_)>1):
+							print("\nCDF Display\n")
+							f.write("\nCDF Display\n")
 							cdf = DataFrame(model.coef_,dataset.columns,columns=['Coeffecients'])
 							f.write(str(cdf))
 							print(cdf)
-							f.close()
+						f.close()
 					elif(ch==2):
 						sel = SelectFromModel(Lasso(alpha=100))
 						sel.fit(X_train,y_train)
-						print(sel.get_support())
-						print(sel.estimator_.coef_)
 						f = open(str(pwd)+"/Workspaces/"+str(wk)+'/lasso.txt',"w+")
-						f.write(str(sel.get_support()))
-						f.write(str(sel.estimator_.coef_))	
+						print("Lasso Model Evaluation on Feature Selection\n")
+						f.write("Lasso Model Evaluation on Feature Selection\n")
+						for (i,j) in zip(list(sel.get_support()),list(X.columns)):
+							if(i>0):
+								print(str(j) + " : "+ str(i))
+								f.write(str(j) + " : "+ str(i))
+						print("Estimator_Coeff : ",sel.estimator_.coef_)
+						f.write("Estimator_Coeff : ",sel.estimator_.coef_)	
+						f.close()
 					break		
 	except KeyboardInterrupt:
 		exit_banner()
