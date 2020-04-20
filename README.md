@@ -46,7 +46,7 @@ Use ```python3 setup.py``` to configure the environment for ***FeatSel*** .
  This project is licensed under the Apache License - see the [LICENSE.md](/LICENSE) file for details
  
 ## Versioning 
-**Version : 1.0.0
+**Version : 1.0.1
 Next Version :soon:**
 
 ## Contributor
