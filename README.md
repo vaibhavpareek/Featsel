@@ -6,6 +6,7 @@
 
 ![FeatSel Logo](/logo/logo.png)
 
+```
 # Prerequisite 
 - [x]  Operating System  : Linux
 - [x]  Python3 : Installed and Configured
@@ -13,6 +14,7 @@
 - [x]  RAM : >2GB(Prefer)
 - [x]  Space : Around 50MB (Later depends on Dataset) 
 - [x]  Updates : Keep Code Updated by `git pull`
+```
 
 ## [Download](https://github.com/vaibhavpareek/Featsel.git) the FeatSel
 ```
