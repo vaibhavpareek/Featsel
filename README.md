@@ -12,6 +12,7 @@
 - [x]  Permissions : Run as Root
 - [x]  RAM : >2GB(Prefer)
 - [x]  Space : Around 50MB (Later depends on Dataset) 
+- [x]  Updates : Keep Code Updated by `git pull`
 
 ## [Download](https://github.com/vaibhavpareek/Featsel.git) the FeatSel
 ```git clone https://github.com/vaibhavpareek/Featsel.git```
