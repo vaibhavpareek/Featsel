@@ -15,7 +15,9 @@
 - [x]  Updates : Keep Code Updated by `git pull`
 
 ## [Download](https://github.com/vaibhavpareek/Featsel.git) the FeatSel
-```git clone https://github.com/vaibhavpareek/Featsel.git```
+```
+git clone https://github.com/vaibhavpareek/Featsel.git
+```
 
 
 ## Environment Setup
