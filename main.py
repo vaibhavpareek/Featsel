@@ -1,9 +1,9 @@
-pwd = '/root/Documents/own_scripts/Featsel'
+pwd = '/root/Desktop/Vaibhav-tools/Featsel'
 from pandas import read_csv,get_dummies,DataFrame,Series
 import cv2
 import sys
 from seaborn import heatmap,pairplot,set
-from os import system,popen
+from os import system,popen,path
 from sklearn.feature_selection import mutual_info_regression as mi
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
@@ -31,6 +31,66 @@ def version():
 	print("FeatSel 1.0.0")
 	exit_banner()
 	sys.exit(0)
+
+def pre_process_dataset():
+	try:
+		print("""
+	DataPreprocessing Includes:
+	Data Cleaning
+	Imputation(Replace Missing Values)
+	Dealing with Strings in the DataSet
+	Categorical Varibales Encoding (ONE HOT ENCODING)
+	Resolving Dependancy after or before dummy variable (Dummy Variable Trap)
+		 """)
+		dtset = input("Location of the Dataset : ")
+		pth = str(pwd)+"/Demodataset/"+str(dtset)
+		if(path.isfile(pth)==False):
+			print("No Such File Exist in System")
+			exit_banner()
+			sys.exit(0)
+		dtset = read_csv(pth)
+		org_dataset=dtset
+		print("Columns List ")
+		k=1
+		for i in dtset.columns:
+			print(str(k)+" "+i)
+			k=k+1
+		y = input("Choose y (eg:" + dtset.columns[0]+ ") : ")
+		y_set = dtset[y]
+		k=1
+		str_feat=[]
+		for i in dtset.columns:
+			if type(dtset[i][0])==str:
+				str_feat.append(i)
+				print(str(k)+" " + i)
+				k=k+1
+		ch = list(map(int, input("Select Unuseful Feature (eg : 1,2): ").split(',')))
+		for i in ch:
+			dtset.drop(str_feat[i-1],axis=1,inplace=True)
+		print("Dropped Unuseful Data")
+		k=1
+		dtset.drop(y,axis=1,inplace=True)
+		print("Categorical Variables")
+		for i in dtset.columns:
+			if(len(Series(dtset[i]).unique())<=10):
+				print(str(k)+" "+str(i))
+				k=k+1
+		ch = input("ONE HOT ENCODING (y/n) : ").lower()
+		if(ch=='y' or ch =='yes'):
+			print("yes")
+		else:
+			print("Done Data Cleaning")
+
+	except KeyboardInterrupt :
+		exit_banner()
+		sys.exit(0)
+	except Exception as e:
+		print(e)
+		print("Some Error Occured")
+		exit_banner()
+		sys.exit(0)
+
+
 def workspace():
 	try:
 		while True:
@@ -281,7 +341,10 @@ def tui_interface(tui):
 				wk = workspace()
 				begin=False
 			print("Feature Selection Methods")
-			print("Hint: Use FeatSel --list to view all locally available datasets")
+			print("""
+				Hint: Use FeatSel --list to view all locally available datasets
+				Use : FeatSel --pre or FeatSel -p (Data PreProcessing)
+				""")
 			print("1. Filter Method")
 			print("2. Wrapper Method")
 			print("3. Embedded Method")
@@ -553,6 +616,9 @@ def main():
 			elif(arg[1]=="--add" or arg[1]=="-a"):
 				print("\033[1;34;48m")
 				add_dataset()
+			elif(arg[1]=='--pre' or arg[1]=='-p'):
+				print("\033[1;34;48m")
+				pre_process_dataset()
 			else:
 				print(str(arg[1]+" not supported by FeatSel"))
 				exit_banner()
