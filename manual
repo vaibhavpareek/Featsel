@@ -35,6 +35,9 @@ DESCRIPTION
        -l, --list
               To list the datasets in local center
 
+       -p, --pre
+              For DATA Preprocessing data(data cleaning)
+       
        -s, --setup
               To set the environment for the command
 
