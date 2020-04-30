@@ -1,5 +1,5 @@
 pwd = '/root/Desktop/Vaibhav-tools/Featsel'
-from pandas import read_csv,get_dummies,DataFrame,Series
+from pandas import read_csv,get_dummies,DataFrame,Series,concat
 import cv2
 import sys
 from seaborn import heatmap,pairplot,set
@@ -13,6 +13,7 @@ from sklearn.linear_model import Lasso
 from statsmodels.api import OLS
 from pyfiglet import Figlet
 from clint.textui import colored
+import csv
 set()
 
 def banner():
@@ -32,8 +33,46 @@ def version():
 	exit_banner()
 	sys.exit(0)
 
+def workspace():
+	try:
+		while True:
+			system("clear")
+			banner()
+			ch = input("Workspace (New/Old) : ").lower()
+			w_name = input("WorkSpace Name : ")
+			if(ch=='o' or ch=='old'):
+				f = open(str(pwd)+"/workspace.txt","r")
+				lines = f.readlines()
+				f.close()
+				for w_name in lines:
+					print("WorkSpace loaded Successfully")
+				break		
+			elif(ch=='n' or ch=='new'):
+				f = open(str(pwd)+"/workspace.txt","w+")
+				f.writelines(str(w_name))
+				f.close()
+				system("mkdir -p "+str(pwd)+"/Workspaces/"+str(w_name)+"/images/")
+				print("Workspaces created Successfully")
+				break
+		return w_name
+	except KeyboardInterrupt:
+		exit_banner()
+		sys.exit(0)
+	except Exception as e:
+		print(e)
+		print("Error Creating Workspace")
+		exit_banner()
+		sys.exit(0)
+
+
+
+
+
 def pre_process_dataset():
 	try:
+		wk = workspace()
+		input("Press any Key to Continue..")
+		system("clear")
 		print("""
 	DataPreprocessing Includes:
 	Data Cleaning
@@ -71,16 +110,26 @@ def pre_process_dataset():
 		k=1
 		dtset.drop(y,axis=1,inplace=True)
 		print("Categorical Variables")
+		ct_var = []
+		res = []
 		for i in dtset.columns:
 			if(len(Series(dtset[i]).unique())<=10):
 				print(str(k)+" "+str(i))
+				ct_var.append(i)
 				k=k+1
+			else:
+				print(i)
+				res.append(DataFrame(dtset[i]))
 		ch = input("ONE HOT ENCODING (y/n) : ").lower()
 		if(ch=='y' or ch =='yes'):
-			print("yes")
-		else:
-			print("Done Data Cleaning")
-
+			for i in ct_var:
+				tr = dtset[i]
+				tr = get_dummies(tr,drop_first=True)
+				res.append(DataFrame(tr))
+		print("Done Data Cleaning")
+		res = concat(res,axis=1)
+		res.to_csv(str(pwd)+"/Workspaces/"+str(wk)+'/processed_data.csv')
+		print("Data may not be free from missing values.")
 	except KeyboardInterrupt :
 		exit_banner()
 		sys.exit(0)
@@ -90,37 +139,6 @@ def pre_process_dataset():
 		exit_banner()
 		sys.exit(0)
 
-
-def workspace():
-	try:
-		while True:
-			system("clear")
-			banner()
-			ch = input("Workspace (New/Old) : ").lower()
-			w_name = input("WorkSpace Name : ")
-			if(ch=='o' or ch=='old'):
-				f = open(str(pwd)+"/workspace.txt","r")
-				lines = f.readlines()
-				f.close()
-				for w_name in lines:
-					print("WorkSpace loaded Successfully")
-				break		
-			elif(ch=='n' or ch=='new'):
-				f = open(str(pwd)+"/workspace.txt","w+")
-				f.writelines(str(w_name))
-				f.close()
-				system("mkdir -p "+str(pwd)+"/Workspaces/"+str(w_name)+"/images/")
-				print("Workspaces created Successfully")
-				break
-		return w_name
-	except KeyboardInterrupt:
-		exit_banner()
-		sys.exit(0)
-	except Exception as e:
-		print(e)
-		print("Error Creating Workspace")
-		exit_banner()
-		sys.exit(0)
 
 
 
